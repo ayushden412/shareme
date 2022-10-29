@@ -1,10 +1,10 @@
 {
   "root": true,
   "project": {
-    "name": "shareme-backend"
+    "name": "shareme_jsm"
   },
   "api": {
-    "projectId": "2ofts59y",
+    "projectId": "1yaogh2k",
     "dataset": "production"
   },
   "plugins": [
