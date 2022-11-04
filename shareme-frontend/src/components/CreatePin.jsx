@@ -1,11 +1,11 @@
 import React from "react"
 
-function Pins(){
+function CreatePin(){
     return(
         <div>
-            Pins
+            CreatePin
         </div>
     )
 }
 
-export default Pins
+export default CreatePin

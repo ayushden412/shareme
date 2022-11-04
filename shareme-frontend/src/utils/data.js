@@ -1,4 +1,4 @@
-export function userQuery(userId){
+export const userQuery = () =>{
     const query = `*[type=="user" && _id=='${userId}']`
-    return query
-}
+    return query;
+};
