@@ -1,16 +1,30 @@
 import React from "react"
-import GoogleLogin from "react-google-login"
+import { GoogleLogin } from "@react-oauth/google"
 import { useNavigate } from "react-router-dom"
 import {FcGoogle} from "react-icons/fc"
 import shareVideo from "../assets/share.mp4"
 import logo from "../assets/logowhite.png"
 
 import {client} from "../client"
-
-const clientId = "250068797667-ioekk9a0rgon1lmq3p85v9jugu9pblcr.apps.googleusercontent.com"
+import jwt_decode from "jwt-decode"
 
 function Login(){
     const navigate = useNavigate();
+    const createOrGetUser = (response) => {
+        const decoded = jwt_decode(response.credential);
+        localStorage.setItem('user',JSON.stringify(decoded));
+        const {name,picture,sub} = decoded;
+        const doc = {
+            _id: sub,
+            _type: 'user',
+            userName: name,
+            image: picture,
+        }
+        client.createIfNotExists(doc).then(() => {
+            navigate('/',{replace:true});
+        });
+    }
+    /*const navigate = useNavigate();
     const responseGoogle=(response)=>{
         localStorage.setItem('user',JSON.stringify(response.profileObj));
         const {imageUrl,name,googleId} = response.profileObj;
@@ -24,7 +38,7 @@ function Login(){
             navigate('/', {replace:true});
         });
         console.log(response);
-    }
+    }*/
     return(
         <div className="flex justify-start items-center flex-col h-screen">
             <div className="relative w-full h-full">
@@ -43,7 +57,6 @@ function Login(){
                     </div>
                     <div className="shadow-2xl">
                         <GoogleLogin
-                          clientId={clientId}
                           render={(renderProps)=>(
                             <button
                               type="button"
@@ -54,9 +67,12 @@ function Login(){
                                 <FcGoogle className="mr-4"/> Sign in with google
                             </button>
                           )}
-                          onSuccess={responseGoogle}
-                          onFailure={responseGoogle}
-                          cookiePolicy="single_host_origin"
+                          onSuccess={(response)=>createOrGetUser(response)}
+                          onError={()=>{
+                            console.log('Login Failed');
+                          }}
+                          //onFailure={responseGoogle}
+                          //cookiePolicy="single_host_origin"
                         />
                     </div>
                 </div>
