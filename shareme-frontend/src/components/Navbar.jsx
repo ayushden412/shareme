@@ -4,7 +4,7 @@ import { IoMdAdd, IoMdSearch } from "react-icons/io"
 
 function Navbar({searchTerm,setSearchTerm,user}){
     const navigate = useNavigate();
-    //if(!user) return null;
+    if(!user){
     return(
         <div className="flex gap-2 md:gap-5 w-full mt-5 pb-7">
             <div className="flex justify-start items-center w-full px-2 rounded-md bg-white border-none outline-none focus-within:shadow-sm">
@@ -19,12 +19,14 @@ function Navbar({searchTerm,setSearchTerm,user}){
                 />
             </div>
             <div className="flex gap-3">
-                <Link to="create-pin" className="bg-black text-white rounded-lg w-12 h-12 md:w-14 md:h-12 flex justify-center items-center">
+                <Link to='create-pin' className="bg-black text-white rounded-lg w-12 h-12 md:w-14 md:h-12 flex justify-center items-center">
                     <IoMdAdd/>
                 </Link>
             </div>
         </div>
     )
+    }
+    return null;
 }
 
 export default Navbar
