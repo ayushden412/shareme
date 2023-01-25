@@ -1,18 +1,17 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-
 import { AiOutlineCloudUpload } from 'react-icons/ai';
+import { useNavigate } from 'react-router-dom';
 import { MdDelete } from 'react-icons/md';
 
 import { categories } from '../utils/data';
 import { client } from '../client';
 import Spinner from './Spinner';
 
-function CreatePin(user){
+const CreatePin = ({ user }) => {
   const [title, setTitle] = useState('');
   const [about, setAbout] = useState('');
   const [loading, setLoading] = useState(false);
-  const [destination, setDestination] = useState('');
+  const [destination, setDestination] = useState();
   const [fields, setFields] = useState(false);
   const [category, setCategory] = useState(null);
   const [imageAsset, setImageAsset] = useState(null);
@@ -20,14 +19,16 @@ function CreatePin(user){
 
   const navigate = useNavigate();
 
+  const userInfo = localStorage.getItem('user') !== 'undefined' ? JSON.parse(localStorage.getItem('user')) : localStorage.clear();
+
   const uploadImage = (e) => {
-    const {type,name} = e.target.files[0];
+    const selectedFile = e.target.files[0];
     // uploading asset to sanity
-    if (type === 'image/png' || type === 'image/svg' || type === 'image/jpeg' || type === 'image/gif' || type === 'image/tiff') {
+    if (selectedFile.type === 'image/png' || selectedFile.type === 'image/svg' || selectedFile.type === 'image/jpeg' || selectedFile.type === 'image/gif' || selectedFile.type === 'image/tiff') {
       setWrongImageType(false);
       setLoading(true);
       client.assets
-        .upload('image', e.target.files[0], { contentType: type, filename: name })
+        .upload('image', selectedFile, { contentType: selectedFile.type, filename: selectedFile.name })
         .then((document) => {
           setImageAsset(document);
           setLoading(false);
@@ -41,7 +42,7 @@ function CreatePin(user){
     }
   };
 
-  const savePin=() =>{
+  const savePin = () => {
     if (title && about && destination && imageAsset?._id && category) {
       const doc = {
         _type: 'pin',
@@ -55,24 +56,24 @@ function CreatePin(user){
             _ref: imageAsset?._id,
           },
         },
-          userId: user._id,
-          postedBy: {
+        userId: userInfo?.sub,
+        postedBy: {
           _type: 'postedBy',
-          _ref: user._id,
-          },
+          _ref: userInfo?.sub,
+        },
         category,
       };
       client.create(doc).then(() => {
         navigate('/');
       });
     } else {
-      setFields(true);
-
+      setFields(true); 
+      //return <Spinner message={`We are uploading the images...`}/>
       setTimeout(
         () => {
           setFields(false);
         },
-        2000
+        2000,
       );
     }
   };
@@ -89,7 +90,7 @@ function CreatePin(user){
             )}
             {
               wrongImageType && (
-                <p>It&apos;s wrong file type.</p>
+                <p>It is wrong file type.</p>
               )
             }
             {!imageAsset ? (
@@ -104,7 +105,7 @@ function CreatePin(user){
                   </div>
 
                   <p className="mt-32 text-gray-400">
-                    Recommendation: Use high-quality JPG, JPEG, SVG, PNG, GIF or TIFF less than 20MB
+                    Use high-quality JPG, JPEG, PNG, GIF less than 20MB
                   </p>
                 </div>
                 <input
@@ -144,11 +145,11 @@ function CreatePin(user){
           {user && (
             <div className="flex gap-2 mt-2 mb-2 items-center bg-white rounded-lg ">
               <img
-                src={user.image}
+                src={userInfo.picture}
                 className="w-10 h-10 rounded-full"
                 alt="user-profile"
               />
-              <p className="font-bold">{user.userName}</p>
+              <p className="font-bold">{userInfo.name}</p>
             </div>
           )}
           <input
@@ -176,9 +177,9 @@ function CreatePin(user){
                 className="outline-none w-4/5 text-base border-b-2 border-gray-200 p-2 rounded-md cursor-pointer"
               >
                 <option value="others" className="sm:text-bg bg-white">Select Category</option>
-                {categories.map((category) => (
-                  <option className="text-base border-0 outline-none capitalize bg-white text-black " value={category.name}>
-                    {category.name}
+                {categories.map((item) => (
+                  <option className="text-base border-0 outline-none capitalize bg-white text-black " value={item.name}>
+                    {item.name}
                   </option>
                 ))}
               </select>
@@ -196,7 +197,7 @@ function CreatePin(user){
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default CreatePin
+export default CreatePin;

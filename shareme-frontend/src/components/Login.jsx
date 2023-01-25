@@ -24,21 +24,7 @@ function Login(){
             navigate('/',{replace:true});
         });
     }
-    /*const navigate = useNavigate();
-    const responseGoogle=(response)=>{
-        localStorage.setItem('user',JSON.stringify(response.profileObj));
-        const {imageUrl,name,googleId} = response.profileObj;
-        const doc={
-            _id: googleId,
-            _type: 'user',
-            userName: name,
-            image: imageUrl,
-        }
-        client.createIfNotExists(doc).then(() => {
-            navigate('/', {replace:true});
-        });
-        console.log(response);
-    }*/
+    
     return(
         <div className="flex justify-start items-center flex-col h-screen">
             <div className="relative w-full h-full">
@@ -71,9 +57,7 @@ function Login(){
                           onError={()=>{
                             console.log('Login Failed');
                           }}
-                          //onFailure={responseGoogle}
-                          //cookiePolicy="single_host_origin"
-                        />
+                          />
                     </div>
                 </div>
             </div>
